@@ -1,37 +1,39 @@
-let clients = JSON.parse(localStorage.getItem("clients")) || [];
-let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
-let payments = JSON.parse(localStorage.getItem("payments")) || [];
+// ===== Sidebar Toggle =====
+function toggleSidebar(){
+const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("overlay");
 
-function save() {
-    localStorage.setItem("clients", JSON.stringify(clients));
-    localStorage.setItem("bookings", JSON.stringify(bookings));
-    localStorage.setItem("payments", JSON.stringify(payments));
+if(!sidebar || !overlay) return;
+
+sidebar.classList.toggle("active");
+overlay.classList.toggle("show");
 }
 
-function id() {
-    return Date.now();
+function closeSidebar(){
+const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("overlay");
+
+if(!sidebar || !overlay) return;
+
+sidebar.classList.remove("active");
+overlay.classList.remove("show");
 }
 
-function totalRevenue() {
-    return payments.reduce((s, p) => s + Number(p.amount), 0);
+// ===== Dark Mode =====
+function toggleMode(){
+if(document.body.classList.contains("dark")){
+document.body.classList.remove("dark");
+document.body.classList.add("light");
+localStorage.setItem("theme","light");
+}else{
+document.body.classList.remove("light");
+document.body.classList.add("dark");
+localStorage.setItem("theme","dark");
+}
 }
 
-function remaining(bookingId) {
-    let booking = bookings.find(b => b.id == bookingId);
-    let paid = payments.filter(p => p.bookingId == bookingId)
-        .reduce((s, p) => s + Number(p.amount), 0);
-    return booking.total - paid;
-}
-
-function toggleSidebar() {
-    document.querySelector(".sidebar").classList.toggle("collapsed");
-}
-
-function toggleMode() {
-    document.body.classList.toggle("light");
-    document.body.classList.toggle("dark");
-}
-
-window.onload = function() {
-    document.querySelector(".loader").style.display = "none";
-}
+// Load Theme
+window.addEventListener("DOMContentLoaded", function(){
+let savedTheme = localStorage.getItem("theme") || "dark";
+document.body.classList.add(savedTheme);
+});

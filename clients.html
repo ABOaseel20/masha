@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>إدارة العملاء | قصر الماسة</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+
+    <!-- Google Font Cairo -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            transition: .3s;
+            overflow-x: hidden;
+        }
+        
+        body.dark {
+            background: #0d1117;
+            color: #f1f1f1;
+        }
+        
+        body.light {
+            background: #f4f6f9;
+            color: #222;
+        }
+        /* Sidebar */
+        
+        .sidebar {
+            width: 250px;
+            min-height: 100vh;
+            background: #161b22;
+            position: fixed;
+            right: 0;
+            top: 0;
+            transition: .3s;
+            padding: 20px;
+            z-index: 1000;
+        }
+        
+        .sidebar.closed {
+            right: -260px;
+        }
+        
+        .sidebar a {
+            color: #ddd;
+            display: block;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            text-decoration: none;
+        }
+        
+        .sidebar a:hover {
+            background: linear-gradient(45deg, gold, orange);
+            color: black;
+        }
+        /* Main */
+        
+        .main {
+            margin-right: 250px;
+            transition: .3s;
+            padding: 30px;
+        }
+        
+        .main.full {
+            margin-right: 0;
+        }
+        /* Cards */
+        
+        .card-custom {
+            border-radius: 16px;
+            background: #1f2937;
+            color: white;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        body.light .card-custom {
+            background: white;
+            color: black;
+        }
+        /* Buttons */
+        
+        .btn-gold {
+            background: linear-gradient(45deg, gold, orange);
+            border: none;
+            color: black;
+            font-weight: bold;
+        }
+        
+        .table thead {
+            background: #111;
+            color: gold;
+        }
+        
+        .table td {
+            vertical-align: middle;
+            font-weight: 600;
+        }
+        
+        input.form-control {
+            background: #111;
+            color: white;
+            border: 1px solid #333;
+        }
+        
+        body.light input.form-control {
+            background: white;
+            color: black;
+        }
+        
+        @media(max-width:991px) {
+            .main {
+                margin-right: 0;
+            }
+            .sidebar {
+                right: -260px;
+            }
+        }
+    </style>
+</head>
+
+<body class="dark">
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <h4 class="text-warning text-center mb-4">💎 الماسة</h4>
+        <a href="index.html">🏠 داشبورد</a>
+        <a href="clients.html">👥 العملاء</a>
+        <a href="bookings.html">📅 الحجوزات</a>
+        <a href="payments.html">💰 الدفعات</a>
+        <a href="reports.html">📊 التقارير</a>
+    </div>
+
+    <!-- Main -->
+    <div class="main" id="main">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="text-warning fw-bold">إدارة العملاء</h3>
+            <div>
+                <button onclick="toggleMode()" class="btn btn-outline-warning">🌙 / ☀</button>
+                <button onclick="toggleSidebar()" class="btn btn-outline-light">☰</button>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <div class="card card-custom p-4 mb-4">
+            <form id="clientForm" class="row g-3">
+
+                <div class="col-md-5">
+                    <label class="form-label">اسم العميل</label>
+                    <input type="text" id="name" class="form-control" required>
+                </div>
+
+                <div class="col-md-5">
+                    <label class="form-label">رقم الجوال</label>
+                    <input type="text" id="phone" class="form-control" required>
+                </div>
+
+                <div class="col-md-2 d-flex align-items-end">
+                    <button class="btn btn-gold w-100">حفظ</button>
+                </div>
+
+            </form>
+        </div>
+
+        <!-- Table -->
+        <div class="card card-custom p-4">
+
+            <table class="table table-bordered text-center align-middle">
+                <thead>
+                    <tr>
+                        <th>الاسم</th>
+                        <th>الجوال</th>
+                        <th>تعديل</th>
+                        <th>حذف</th>
+                    </tr>
+                </thead>
+                <tbody id="clientTable"></tbody>
+            </table>
+
+        </div>
+
+    </div>
+
+    <script>
+        let clients = JSON.parse(localStorage.getItem("clients")) || [];
+
+        function save() {
+            localStorage.setItem("clients", JSON.stringify(clients));
+        }
+
+        function id() {
+            return Date.now();
+        }
+
+        function render() {
+            let table = document.getElementById("clientTable");
+            table.innerHTML = "";
+
+            clients.forEach(c => {
+                table.innerHTML += `
+<tr>
+<td>${c.name}</td>
+<td>${c.phone}</td>
+<td>
+<button class="btn btn-sm btn-info"
+onclick="editClient(${c.id})">✏</button>
+</td>
+<td>
+<button class="btn btn-sm btn-danger"
+onclick="deleteClient(${c.id})">🗑</button>
+</td>
+</tr>`;
+            });
+        }
+
+        function deleteClient(clientId) {
+            clients = clients.filter(c => c.id != clientId);
+            save();
+            render();
+        }
+
+        function editClient(clientId) {
+            let client = clients.find(c => c.id == clientId);
+            document.getElementById("name").value = client.name;
+            document.getElementById("phone").value = client.phone;
+
+            clients = clients.filter(c => c.id != clientId);
+        }
+
+        document.getElementById("clientForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+
+            clients.push({
+                id: id(),
+                name: document.getElementById("name").value,
+                phone: document.getElementById("phone").value
+            });
+
+            save();
+            this.reset();
+            render();
+        });
+
+        function toggleSidebar() {
+            document.getElementById("sidebar").classList.toggle("closed");
+            document.getElementById("main").classList.toggle("full");
+        }
+
+        function toggleMode() {
+            if (document.body.classList.contains("dark")) {
+                document.body.classList.remove("dark");
+                document.body.classList.add("light");
+                localStorage.setItem("theme", "light");
+            } else {
+                document.body.classList.remove("light");
+                document.body.classList.add("dark");
+                localStorage.setItem("theme", "dark");
+            }
+        }
+
+        window.onload = function() {
+            let savedTheme = localStorage.getItem("theme") || "dark";
+            document.body.classList.add(savedTheme);
+            render();
+        }
+    </script>
+
+</body>
+
+</html>

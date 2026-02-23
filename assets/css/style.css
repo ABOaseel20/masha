@@ -2,35 +2,43 @@ body{
 font-family:'Cairo',sans-serif;
 transition:.3s;
 overflow-x:hidden;
+margin:0;
 }
 
-/* الوضع الليلي */
+/* Dark Mode */
 body.dark{
 background:#0d1117;
 color:#f1f1f1;
 }
 
-/* الوضع النهاري */
+/* Light Mode */
 body.light{
 background:#f4f6f9;
 color:#222;
 }
 
-/* ===== Sidebar ===== */
+/* Sidebar */
 .sidebar{
 width:260px;
-min-height:100vh;
+height:100vh;
 background:#161b22;
 position:fixed;
-right:0;
+right:-260px;
 top:0;
 padding:20px;
-transition:.3s;
-z-index:1000;
+transition:.4s ease;
+z-index:1050;
+box-shadow:-5px 0 25px rgba(0,0,0,0.4);
 }
 
-.sidebar.closed{
-right:-260px;
+.sidebar.active{
+right:0;
+}
+
+.sidebar h4{
+color:gold;
+text-align:center;
+margin-bottom:30px;
 }
 
 .sidebar a{
@@ -48,18 +56,27 @@ background:linear-gradient(45deg,gold,orange);
 color:black;
 }
 
-/* ===== Main Layout ===== */
+/* Overlay */
+.overlay{
+position:fixed;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.6);
+top:0;
+left:0;
+display:none;
+z-index:1040;
+}
+
+.overlay.show{
+display:block;
+}
+
+/* Main */
 .main{
-margin-right:260px;
 padding:25px;
-transition:.3s;
 }
 
-.main.full{
-margin-right:0;
-}
-
-/* ===== Cards ===== */
 .card-custom{
 border-radius:16px;
 background:#1f2937;
@@ -67,7 +84,7 @@ color:white;
 box-shadow:0 8px 30px rgba(0,0,0,0.4);
 border:1px solid rgba(255,215,0,0.3);
 padding:25px;
-height:100%;
+margin-bottom:25px;
 }
 
 body.light .card-custom{
@@ -75,58 +92,12 @@ background:white;
 color:black;
 }
 
-/* مسافات احترافية بين الكروت */
-.row.gap-cards > div{
-margin-bottom:25px;
-}
-
-/* ===== أزرار ===== */
-.btn-gold{
-background:linear-gradient(45deg,gold,orange);
-border:none;
-color:black;
-font-weight:bold;
-}
-
-/* ===== Loader ===== */
-.loader{
-position:fixed;
-width:100%;
-height:100%;
-background:black;
-display:flex;
-justify-content:center;
-align-items:center;
-z-index:9999;
-}
-
-.loader img{
-width:100px;
-animation:spin 2s linear infinite;
-}
-
-@keyframes spin{
-100%{transform:rotate(360deg);}
-}
-
-/* ===== Responsive ===== */
-@media(max-width:991px){
-
+/* Responsive */
+@media(min-width:992px){
 .sidebar{
-right:-260px;
+right:0;
 }
-
-.main{
-margin-right:0;
-padding:15px;
+.overlay{
+display:none !important;
 }
-
-.card-custom{
-padding:18px;
-}
-
-h3{
-font-size:20px;
-}
-
 }

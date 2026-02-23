@@ -1,39 +1,64 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
 <meta charset="UTF-8">
 <title>لوحة التحكم | قصر الماسة</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link href="assets/css/style.css" rel="stylesheet">
 </head>
 
-<body>
+<body class="dark">
 
+<!-- ===== HEADER ===== -->
 <div class="header">
-<button class="toggle-btn" type="button" onclick="toggleSidebar()">☰</button>
+<button class="toggle-btn" onclick="toggleSidebar()">☰</button>
 <h4>لوحة التحكم</h4>
-<div>💎 الماسة</div>
+<div>
+<button onclick="toggleMode()" class="btn btn-sm btn-warning">🌙 / ☀</button>
+</div>
 </div>
 
+<!-- ===== Overlay ===== -->
 <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
+<!-- ===== Sidebar ===== -->
 <div class="sidebar" id="sidebar">
 <a href="index.html" class="active-link">🏠 داشبورد</a>
 <a href="clients.html">👥 العملاء</a>
 <a href="bookings.html">📅 الحجوزات</a>
-<a href="payments.html">💰 المدفوعات</a>
+<a href="payments.html">💰 الدفعات</a>
 <a href="reports.html">📊 التقارير</a>
 </div>
 
+<!-- ===== Main ===== -->
 <div class="main">
-<div class="card-box">
-<h5>مرحبًا بك في نظام قصر الماسة</h5>
-<p>لوحة تحكم احترافية لإدارة القاعة.</p>
-</div>
+
+<div class="card-custom mb-4">
+<h5 class="text-warning fw-bold">مرحبًا بك في نظام قصر الماسة</h5>
+<p>لوحة تحكم متكاملة لإدارة العملاء، الحجوزات، والمدفوعات.</p>
 </div>
 
-<script src="app.js"></script>
+<!-- ===== Footer Signature ===== -->
+<hr class="mt-5">
+
+<div class="text-center mt-4">
+<p style="
+font-weight:800;
+background:linear-gradient(45deg,gold,orange);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+font-size:18px;">
+✨ برمجة وتصميم فهد الحربي ✨
+</p>
+</div>
+
+</div>
+
+<script src="assets/js/app.js"></script>
+
 </body>
 </html>

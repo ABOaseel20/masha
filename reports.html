@@ -2,122 +2,164 @@
 <html lang="ar" dir="rtl">
 
 <head>
-    <meta charset="UTF-8">
-    <title>الدفعات</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
-    <link href="assets/css/style.css" rel="stylesheet">
+<meta charset="UTF-8">
+<title>إدارة الدفعات | قصر الماسة</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+<link href="assets/css/style.css" rel="stylesheet">
 </head>
 
 <body class="dark">
 
-    <div class="loader">
-        <img src="assets/img/diamond.png">
-    </div>
+<!-- ===== HEADER ===== -->
+<div class="header">
+<button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+<h4>إدارة الدفعات</h4>
+<div>
+<button onclick="toggleMode()" class="btn btn-sm btn-warning">🌙 / ☀</button>
+</div>
+</div>
 
-    <div class="d-flex">
+<!-- ===== Overlay ===== -->
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
-        <div class="sidebar p-3">
-            <h4 class="text-warning text-center">💎 الماسة</h4>
-            <a href="index.html">🏠 داشبورد</a>
-            <a href="clients.html">👥 العملاء</a>
-            <a href="bookings.html">📅 الحجوزات</a>
-            <a href="payments.html">💰 الدفعات</a>
-            <a href="reports.html">📊 التقارير</a>
-            <button onclick="toggleMode()" class="btn btn-sm btn-warning mt-3">🌙 تبديل الوضع</button>
-        </div>
+<!-- ===== Sidebar ===== -->
+<div class="sidebar" id="sidebar">
+<a href="index.html">🏠 داشبورد</a>
+<a href="clients.html">👥 العملاء</a>
+<a href="bookings.html">📅 الحجوزات</a>
+<a href="payments.html" class="active-link">💰 الدفعات</a>
+<a href="reports.html">📊 التقارير</a>
+</div>
 
-        <div class="flex-fill p-4">
+<!-- ===== Main ===== -->
+<div class="main">
 
-            <button onclick="toggleSidebar()" class="btn btn-outline-warning mb-3">☰</button>
+<!-- ===== Form ===== -->
+<div class="card-custom mb-4">
 
-            <h3 class="text-warning mb-4">إدارة الدفعات</h3>
+<form id="paymentForm" class="row g-3">
 
-            <form id="paymentForm" class="row g-2">
+<div class="col-md-4">
+<label class="form-label">الحجز</label>
+<select id="bookingSelect" class="form-control" required></select>
+</div>
 
-                <div class="col-md-4">
-                    <select id="bookingSelect" class="form-control" required></select>
-                </div>
+<div class="col-md-3">
+<label class="form-label">المبلغ</label>
+<input type="number" id="amount" class="form-control" required>
+</div>
 
-                <div class="col-md-3">
-                    <input type="number" id="amount" class="form-control" placeholder="المبلغ" required>
-                </div>
+<div class="col-md-3">
+<label class="form-label">التاريخ</label>
+<input type="date" id="paymentDate" class="form-control" required>
+</div>
 
-                <div class="col-md-3">
-                    <input type="date" id="paymentDate" class="form-control" required>
-                </div>
+<div class="col-md-2 d-flex align-items-end">
+<button class="btn btn-success w-100">حفظ</button>
+</div>
 
-                <div class="col-md-2">
-                    <button class="btn btn-success w-100">حفظ</button>
-                </div>
+</form>
 
-            </form>
+</div>
 
-            <hr>
+<!-- ===== Table ===== -->
+<div class="card-custom">
 
-            <table class="table table-dark table-bordered text-center">
-                <thead>
-                    <tr>
-                        <th>العميل</th>
-                        <th>المبلغ</th>
-                        <th>التاريخ</th>
-                        <th>المتبقي</th>
-                    </tr>
-                </thead>
-                <tbody id="paymentTable"></tbody>
-            </table>
-
-        </div>
-    </div>
-
-    <script src="assets/js/app.js"></script>
-    <script>
-        function loadBookings() {
-            let select = document.getElementById("bookingSelect");
-            select.innerHTML = "";
-            bookings.forEach(b => {
-                let client = clients.find(c => c.id == b.clientId);
-                select.innerHTML += `<option value="${b.id}">
-${client?.name} - ${b.date}
-</option>`;
-            });
-        }
-
-        function renderPayments() {
-            let table = document.getElementById("paymentTable");
-            table.innerHTML = "";
-            payments.forEach(p => {
-                let booking = bookings.find(b => b.id == p.bookingId);
-                let client = clients.find(c => c.id == booking.clientId);
-                table.innerHTML += `
+<table class="table table-bordered text-center align-middle">
+<thead class="table-dark">
 <tr>
-<td>${client?.name}</td>
-<td>${p.amount}</td>
+<th>العميل</th>
+<th>المبلغ</th>
+<th>التاريخ</th>
+<th>المتبقي</th>
+</tr>
+</thead>
+<tbody id="paymentTable"></tbody>
+</table>
+
+</div>
+
+</div>
+
+<script src="assets/js/app.js"></script>
+
+<script>
+
+/* ===== Page Specific Logic ===== */
+
+let clients = JSON.parse(localStorage.getItem("clients")) || [];
+let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+let payments = JSON.parse(localStorage.getItem("payments")) || [];
+
+function loadBookings(){
+let select=document.getElementById("bookingSelect");
+select.innerHTML="";
+
+bookings.forEach(b=>{
+let client=clients.find(c=>c.id==b.clientId);
+select.innerHTML+=`
+<option value="${b.id}">
+${client?.name || "-"} - ${b.date}
+</option>`;
+});
+}
+
+function remaining(bookingId){
+let booking=bookings.find(b=>b.id==bookingId);
+let paid=payments
+.filter(p=>p.bookingId==bookingId)
+.reduce((s,p)=>s+Number(p.amount),0);
+
+return booking ? booking.total - paid : 0;
+}
+
+function renderPayments(){
+let table=document.getElementById("paymentTable");
+table.innerHTML="";
+
+payments.forEach(p=>{
+let booking=bookings.find(b=>b.id==p.bookingId);
+let client=clients.find(c=>c.id==booking?.clientId);
+
+table.innerHTML+=`
+<tr>
+<td>${client?.name || "-"}</td>
+<td>${p.amount} ريال</td>
 <td>${p.date}</td>
-<td>${remaining(p.bookingId)}</td>
+<td class="${remaining(p.bookingId)>0?'text-danger fw-bold':'text-success fw-bold'}">
+${remaining(p.bookingId)}
+</td>
 </tr>`;
-            });
-        }
+});
+}
 
-        document.getElementById("paymentForm").addEventListener("submit", function(e) {
-            e.preventDefault();
+document.getElementById("paymentForm").addEventListener("submit",function(e){
+e.preventDefault();
 
-            payments.push({
-                id: id(),
-                bookingId: document.getElementById("bookingSelect").value,
-                amount: Number(document.getElementById("amount").value),
-                date: document.getElementById("paymentDate").value
-            });
+payments.push({
+id: Date.now(),
+bookingId: document.getElementById("bookingSelect").value,
+amount: Number(document.getElementById("amount").value),
+date: document.getElementById("paymentDate").value
+});
 
-            save();
-            this.reset();
-            renderPayments();
-        });
+localStorage.setItem("payments",JSON.stringify(payments));
+this.reset();
+renderPayments();
+});
 
-        loadBookings();
-        renderPayments();
-    </script>
+/* ===== Init ===== */
+window.onload=function(){
+let savedTheme=localStorage.getItem("theme") || "dark";
+document.body.classList.add(savedTheme);
+loadBookings();
+renderPayments();
+}
+
+</script>
 
 </body>
-
 </html>

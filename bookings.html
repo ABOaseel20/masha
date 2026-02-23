@@ -2,224 +2,209 @@
 <html lang="ar" dir="rtl">
 
 <head>
-    <meta charset="UTF-8">
-    <title>إدارة الحجوزات | قصر الماسة</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<title>إدارة الحجوزات | قصر الماسة</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 
-    <style>
-        body {
-            font-family: 'Cairo', sans-serif;
-            transition: .3s;
-        }
-        
-        body.dark {
-            background: #0d1117;
-            color: #f1f1f1;
-        }
-        
-        body.light {
-            background: #f4f6f9;
-            color: #222;
-        }
-        
-        .sidebar {
-            width: 240px;
-            min-height: 100vh;
-            background: #161b22;
-            transition: .3s;
-        }
-        
-        .sidebar.collapsed {
-            width: 70px;
-        }
-        
-        .sidebar a {
-            color: #ddd;
-            padding: 12px;
-            display: block;
-            text-decoration: none;
-            border-radius: 8px;
-            margin-bottom: 6px;
-        }
-        
-        .sidebar a:hover {
-            background: linear-gradient(45deg, gold, orange);
-            color: black;
-        }
-        
-        .card-custom {
-            border-radius: 12px;
-            background: #1f2937;
-            color: white;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-        }
-        
-        body.light .card-custom {
-            background: white;
-            color: black;
-        }
-        
-        .btn-gold {
-            background: linear-gradient(45deg, gold, orange);
-            border: none;
-            color: black;
-            font-weight: bold;
-        }
-        
-        .loader {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            background: black;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
-        
-        .loader img {
-            width: 100px;
-            animation: spin 2s linear infinite;
-        }
-        
-        @keyframes spin {
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-    </style>
+<style>
+
+body.dark{
+background:#0f172a;
+color:white;
+}
+
+body.light{
+background:#f4f6f9;
+color:#222;
+}
+
+.card-custom{
+background:#1e293b;
+border-radius:15px;
+box-shadow:0 10px 25px rgba(0,0,0,.4);
+}
+
+body.light .card-custom{
+background:white;
+color:black;
+}
+
+.btn-gold{
+background:linear-gradient(45deg,gold,orange);
+border:none;
+color:black;
+font-weight:bold;
+}
+
+.table thead{
+background:#111;
+color:gold;
+}
+
+body.light .table thead{
+background:#eee;
+color:#333;
+}
+
+input.form-control, select.form-control{
+background:#111;
+color:white;
+border:1px solid #333;
+}
+
+body.light input.form-control,
+body.light select.form-control{
+background:white;
+color:black;
+}
+
+.loader{
+position:fixed;
+width:100%;
+height:100%;
+background:black;
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:2000;
+}
+
+.loader img{
+width:90px;
+animation:spin 2s linear infinite;
+}
+
+@keyframes spin{
+100%{transform:rotate(360deg);}
+}
+
+</style>
 </head>
 
 <body class="dark">
 
-    <!-- Loader -->
-    <div class="loader">
-        <img src="assets/img/diamond.png">
-    </div>
+<!-- Loader -->
+<div class="loader" id="loader">
+<img src="assets/img/diamond.png">
+</div>
 
-    <div class="d-flex">
+<!-- HEADER -->
+<div class="header">
+<button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+<h4>إدارة الحجوزات</h4>
+<div>
+<button onclick="toggleMode()" class="btn btn-sm btn-warning">🌙 / ☀</button>
+</div>
+</div>
 
-        <!-- Sidebar -->
-        <div class="sidebar p-3">
-            <h4 class="text-warning text-center mb-4">💎 الماسة</h4>
-            <a href="index.html">🏠 داشبورد</a>
-            <a href="clients.html">👥 العملاء</a>
-            <a href="bookings.html">📅 الحجوزات</a>
-            <a href="payments.html">💰 الدفعات</a>
-            <a href="reports.html">📊 التقارير</a>
-        </div>
+<!-- Overlay -->
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
-        <!-- Main -->
-        <div class="flex-fill p-4">
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+<a href="index.html">🏠 داشبورد</a>
+<a href="clients.html">👥 العملاء</a>
+<a href="bookings.html" class="active-link">📅 الحجوزات</a>
+<a href="payments.html">💰 المدفوعات</a>
+<a href="reports.html">📊 التقارير</a>
+</div>
 
-            <!-- Header -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
+<!-- MAIN -->
+<div class="main">
 
-                <h3 class="text-warning">إدارة الحجوزات</h3>
+<!-- FORM -->
+<div class="card card-custom p-4 mb-4">
 
-                <div>
-                    <button onclick="toggleMode()" class="btn btn-outline-warning">
-🌙 / ☀
-</button>
+<form id="bookingForm" class="row g-3">
 
-                    <button onclick="toggleSidebar()" class="btn btn-outline-light">
-☰
-</button>
-                </div>
+<div class="col-md-4">
+<label class="form-label">العميل</label>
+<select id="clientSelect" class="form-control" required></select>
+</div>
 
-            </div>
+<div class="col-md-3">
+<label class="form-label">إجمالي العقد</label>
+<input type="number" id="total" class="form-control" required>
+</div>
 
-            <!-- Form -->
-            <div class="card card-custom p-4 mb-4">
+<div class="col-md-3">
+<label class="form-label">تاريخ المناسبة</label>
+<input type="date" id="date" class="form-control" required>
+</div>
 
-                <form id="bookingForm" class="row g-3">
+<div class="col-md-2 d-flex align-items-end">
+<button class="btn btn-gold w-100">حفظ</button>
+</div>
 
-                    <div class="col-md-4">
-                        <label class="form-label">العميل</label>
-                        <select id="clientSelect" class="form-control" required></select>
-                    </div>
+</form>
 
-                    <div class="col-md-3">
-                        <label class="form-label">إجمالي العقد</label>
-                        <input type="number" id="total" class="form-control" required>
-                    </div>
+</div>
 
-                    <div class="col-md-3">
-                        <label class="form-label">تاريخ المناسبة</label>
-                        <input type="date" id="date" class="form-control" required>
-                    </div>
+<!-- TABLE -->
+<div class="card card-custom p-4">
 
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button class="btn btn-gold w-100">حفظ</button>
-                    </div>
-
-                </form>
-
-            </div>
-
-            <!-- Table -->
-            <div class="card card-custom p-3">
-
-                <table class="table table-bordered text-center align-middle">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>العميل</th>
-                            <th>المبلغ</th>
-                            <th>التاريخ</th>
-                            <th>المتبقي</th>
-                            <th>حذف</th>
-                        </tr>
-                    </thead>
-                    <tbody id="bookingTable"></tbody>
-                </table>
-
-            </div>
-
-        </div>
-    </div>
-
-    <script>
-        let clients = JSON.parse(localStorage.getItem("clients")) || [];
-        let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
-        let payments = JSON.parse(localStorage.getItem("payments")) || [];
-
-        function save() {
-            localStorage.setItem("bookings", JSON.stringify(bookings));
-        }
-
-        function id() {
-            return Date.now();
-        }
-
-        function remaining(bookingId) {
-            let booking = bookings.find(b => b.id == bookingId);
-            let paid = payments
-                .filter(p => p.bookingId == bookingId)
-                .reduce((s, p) => s + Number(p.amount), 0);
-            return booking.total - paid;
-        }
-
-        function loadClients() {
-            let select = document.getElementById("clientSelect");
-            select.innerHTML = "";
-            clients.forEach(c => {
-                select.innerHTML += `<option value="${c.id}">${c.name}</option>`;
-            });
-        }
-
-        function renderBookings() {
-            let table = document.getElementById("bookingTable");
-            table.innerHTML = "";
-
-            bookings.forEach(b => {
-                let client = clients.find(c => c.id == b.clientId);
-
-                table.innerHTML += `
+<table class="table table-bordered text-center align-middle">
+<thead>
 <tr>
-<td>${client?.name}</td>
+<th>العميل</th>
+<th>المبلغ</th>
+<th>التاريخ</th>
+<th>المتبقي</th>
+<th>حذف</th>
+</tr>
+</thead>
+<tbody id="bookingTable"></tbody>
+</table>
+
+</div>
+
+</div>
+
+<script src="app.js"></script>
+
+<script>
+let clients = JSON.parse(localStorage.getItem("clients")) || [];
+let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+let payments = JSON.parse(localStorage.getItem("payments")) || [];
+
+function save(){
+localStorage.setItem("bookings",JSON.stringify(bookings));
+}
+
+function id(){
+return Date.now();
+}
+
+function remaining(bookingId){
+let booking=bookings.find(b=>b.id==bookingId);
+let paid=payments
+.filter(p=>p.bookingId==bookingId)
+.reduce((s,p)=>s+Number(p.amount),0);
+return booking.total-paid;
+}
+
+function loadClients(){
+let select=document.getElementById("clientSelect");
+select.innerHTML="";
+clients.forEach(c=>{
+select.innerHTML+=`<option value="${c.id}">${c.name}</option>`;
+});
+}
+
+function renderBookings(){
+let table=document.getElementById("bookingTable");
+table.innerHTML="";
+
+bookings.forEach(b=>{
+let client=clients.find(c=>c.id==b.clientId);
+
+table.innerHTML+=`
+<tr>
+<td>${client?.name || '—'}</td>
 <td>${b.total} ريال</td>
 <td>${b.date}</td>
 <td class="${remaining(b.id)>0?'text-danger fw-bold':'text-success fw-bold'}">
@@ -227,62 +212,55 @@ ${remaining(b.id)}
 </td>
 <td>
 <button class="btn btn-sm btn-danger"
-onclick="deleteBooking(${b.id})">
-🗑
-</button>
+onclick="deleteBooking(${b.id})">🗑</button>
 </td>
 </tr>`;
-            });
-        }
+});
+}
 
-        function deleteBooking(id) {
-            bookings = bookings.filter(b => b.id != id);
-            save();
-            renderBookings();
-        }
+function deleteBooking(bookingId){
+bookings=bookings.filter(b=>b.id!=bookingId);
+save();
+renderBookings();
+}
 
-        document.getElementById("bookingForm").addEventListener("submit", function(e) {
-            e.preventDefault();
+document.getElementById("bookingForm").addEventListener("submit",function(e){
+e.preventDefault();
 
-            bookings.push({
-                id: id(),
-                clientId: document.getElementById("clientSelect").value,
-                total: Number(document.getElementById("total").value),
-                date: document.getElementById("date").value
-            });
+bookings.push({
+id:id(),
+clientId:document.getElementById("clientSelect").value,
+total:Number(document.getElementById("total").value),
+date:document.getElementById("date").value
+});
 
-            save();
-            this.reset();
-            renderBookings();
-        });
+save();
+this.reset();
+renderBookings();
+});
 
-        function toggleSidebar() {
-            document.querySelector(".sidebar").classList.toggle("collapsed");
-        }
+function toggleMode(){
+if(document.body.classList.contains("dark")){
+document.body.classList.remove("dark");
+document.body.classList.add("light");
+localStorage.setItem("theme","light");
+}else{
+document.body.classList.remove("light");
+document.body.classList.add("dark");
+localStorage.setItem("theme","dark");
+}
+}
 
-        function toggleMode() {
-            if (document.body.classList.contains("dark")) {
-                document.body.classList.remove("dark");
-                document.body.classList.add("light");
-                localStorage.setItem("theme", "light");
-            } else {
-                document.body.classList.remove("light");
-                document.body.classList.add("dark");
-                localStorage.setItem("theme", "dark");
-            }
-        }
+window.onload=function(){
+document.getElementById("loader").style.display="none";
 
-        window.onload = function() {
-            document.querySelector(".loader").style.display = "none";
+let savedTheme=localStorage.getItem("theme")||"dark";
+document.body.classList.add(savedTheme);
 
-            let savedTheme = localStorage.getItem("theme") || "dark";
-            document.body.classList.add(savedTheme);
-
-            loadClients();
-            renderBookings();
-        }
-    </script>
+loadClients();
+renderBookings();
+}
+</script>
 
 </body>
-
 </html>

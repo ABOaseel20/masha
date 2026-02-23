@@ -7,268 +7,37 @@
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<style>
-body{
-font-family:'Cairo',sans-serif;
-transition:.3s;
-overflow-x:hidden;
-}
-
-body.dark{
-background:#0d1117;
-color:#f1f1f1;
-}
-
-body.light{
-background:#f4f6f9;
-color:#222;
-}
-
-/* ===== Sidebar ===== */
-.sidebar{
-width:260px;
-height:100vh;
-background:#161b22;
-position:fixed;
-right:-260px;
-top:0;
-padding:20px;
-transition:.4s ease;
-z-index:1050;
-box-shadow:-5px 0 25px rgba(0,0,0,0.4);
-}
-
-.sidebar.active{
-right:0;
-}
-
-.sidebar a{
-color:#ddd;
-display:block;
-padding:12px;
-border-radius:10px;
-margin-bottom:10px;
-text-decoration:none;
-font-weight:600;
-}
-
-.sidebar a:hover{
-background:linear-gradient(45deg,gold,orange);
-color:black;
-}
-
-/* Overlay */
-.overlay{
-position:fixed;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.6);
-top:0;
-left:0;
-display:none;
-z-index:1040;
-}
-
-.overlay.show{
-display:block;
-}
-
-/* ===== Main ===== */
-.main{
-padding:25px;
-transition:.3s;
-}
-
-/* ===== Cards ===== */
-.card-custom{
-border-radius:16px;
-background:#1f2937;
-color:white;
-box-shadow:0 8px 30px rgba(0,0,0,0.4);
-border:1px solid rgba(255,215,0,0.3);
-padding:25px;
-height:100%;
-}
-
-body.light .card-custom{
-background:white;
-color:black;
-}
-
-.row.gap-cards > div{
-margin-bottom:25px;
-}
-
-/* Loader */
-.loader{
-position:fixed;
-width:100%;
-height:100%;
-background:black;
-display:flex;
-justify-content:center;
-align-items:center;
-z-index:9999;
-}
-
-.loader img{
-width:100px;
-animation:spin 2s linear infinite;
-}
-
-@keyframes spin{
-100%{transform:rotate(360deg);}
-}
-
-/* Responsive */
-@media(min-width:992px){
-.sidebar{
-right:0;
-}
-.overlay{
-display:none !important;
-}
-}
-</style>
+<link rel="stylesheet" href="assets/css/style.css">
 </head>
 
-<body class="dark">
+<body>
 
-<!-- Loader -->
-<div class="loader">
-<img src="assets/img/diamond.png">
-</div>
-
-<!-- Overlay -->
 <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
-<!-- Sidebar -->
 <div class="sidebar" id="sidebar">
-<h4 class="text-warning text-center mb-4">💎 الماسة</h4>
+<h4>💎 الماسة</h4>
 <a href="index.html">🏠 داشبورد</a>
 <a href="clients.html">👥 العملاء</a>
 <a href="bookings.html">📅 الحجوزات</a>
-<a href="payments.html">💰 الدفعات</a>
+<a href="payments.html">💰 المدفوعات</a>
 <a href="reports.html">📊 التقارير</a>
 </div>
 
-<!-- Main -->
 <div class="main">
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-<button onclick="toggleSidebar()" class="btn btn-outline-warning">☰</button>
-<h3 class="text-warning fw-bold">لوحة التحكم</h3>
-<button onclick="toggleMode()" class="btn btn-outline-light">🌙 / ☀</button>
+<button onclick="toggleSidebar()" class="btn btn-warning">☰</button>
+<h3 class="text-warning">لوحة التحكم</h3>
+<button onclick="toggleMode()" class="btn btn-outline-dark">🌙 / ☀</button>
 </div>
 
-<!-- Cards -->
-<div class="row gap-cards mb-4">
-
-<div class="col-lg-4 col-md-6 col-12">
-<div class="card card-custom text-center">
-<h6>عدد الحجوزات</h6>
-<div class="fs-3 fw-bold" id="bCount">0</div>
-</div>
-</div>
-
-<div class="col-lg-4 col-md-6 col-12">
-<div class="card card-custom text-center">
-<h6>إجمالي الإيرادات</h6>
-<div class="fs-3 fw-bold" id="rev">0</div>
-</div>
-</div>
-
-<div class="col-lg-4 col-md-6 col-12">
-<div class="card card-custom text-center">
-<h6>المبالغ المتبقية</h6>
-<div class="fs-3 fw-bold" id="rem">0</div>
-</div>
-</div>
-
-</div>
-
-<!-- Chart -->
 <div class="card card-custom">
-<h5 class="mb-3">إيرادات العمليات</h5>
-<canvas id="chart"></canvas>
+<h5>مرحباً بك في نظام قصر الماسة</h5>
+<p>النظام يعمل الآن بالكامل مع Toggle موحد.</p>
 </div>
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-
-let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
-let payments = JSON.parse(localStorage.getItem("payments")) || [];
-
-function totalRevenue(){
-return payments.reduce((s,p)=>s+Number(p.amount),0);
-}
-
-function remaining(bookingId){
-let booking=bookings.find(b=>b.id==bookingId);
-if(!booking) return 0;
-let paid=payments.filter(p=>p.bookingId==bookingId)
-.reduce((s,p)=>s+Number(p.amount),0);
-return booking.total - paid;
-}
-
-/* ===== Toggle Sidebar ===== */
-function toggleSidebar(){
-document.getElementById("sidebar").classList.toggle("active");
-document.getElementById("overlay").classList.toggle("show");
-}
-
-function closeSidebar(){
-document.getElementById("sidebar").classList.remove("active");
-document.getElementById("overlay").classList.remove("show");
-}
-
-/* ===== Dark Mode ===== */
-function toggleMode(){
-if(document.body.classList.contains("dark")){
-document.body.classList.remove("dark");
-document.body.classList.add("light");
-localStorage.setItem("theme","light");
-}else{
-document.body.classList.remove("light");
-document.body.classList.add("dark");
-localStorage.setItem("theme","dark");
-}
-}
-
-window.onload=function(){
-
-document.querySelector(".loader").style.display="none";
-
-let savedTheme=localStorage.getItem("theme") || "dark";
-document.body.classList.add(savedTheme);
-
-document.getElementById("bCount").innerText=bookings.length;
-document.getElementById("rev").innerText=totalRevenue()+" ريال";
-
-let totalRem=bookings.reduce((s,b)=>s+remaining(b.id),0);
-document.getElementById("rem").innerText=totalRem+" ريال";
-
-new Chart(document.getElementById("chart"),{
-type:"line",
-data:{
-labels:payments.map(p=>p.date),
-datasets:[{
-label:"الإيرادات",
-data:payments.map(p=>p.amount),
-borderColor:"gold",
-backgroundColor:"rgba(255,215,0,0.2)",
-fill:true,
-tension:.4
-}]
-}
-});
-}
-</script>
-
+<script src="assets/js/app.js"></script>
 </body>
 </html>

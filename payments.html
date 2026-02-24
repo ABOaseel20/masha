@@ -2,29 +2,44 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>المدفوعات | قصر الماسة</title>
+<title>إدارة المدفوعات | قصر الماسة</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
 <link href="assets/css/style.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+.stat-card{
+background:linear-gradient(135deg,#1e3a8a,#2563eb);
+border-radius:16px;
+padding:20px;
+text-align:center;
+color:white;
+box-shadow:0 10px 25px rgba(0,0,0,.4);
+}
+.stat-card h3{font-weight:800;}
+</style>
 </head>
 
 <body class="dark">
 
+<!-- Loader -->
 <div class="loader">
 <img src="assets/img/diamond.png">
 </div>
 
-<!-- HEADER -->
+<!-- Header -->
 <div class="header">
 <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
 <h4>إدارة المدفوعات</h4>
 <button onclick="toggleMode()" class="btn btn-sm btn-warning">🌙 / ☀</button>
 </div>
 
-<!-- OVERLAY -->
+<!-- Overlay -->
 <div class="overlay" id="overlay"></div>
 
-<!-- SIDEBAR -->
+<!-- Sidebar -->
 <div class="sidebar" id="sidebar">
 <a href="index.html">🏠 داشبورد</a>
 <a href="clients.html">👥 العملاء</a>
@@ -33,36 +48,42 @@
 <a href="reports.html">📊 التقارير</a>
 </div>
 
-<!-- MAIN -->
+<!-- Main -->
 <div class="main">
 
-<!-- ===== Statistics Cards ===== -->
+<!-- Statistics -->
 <div class="row g-4 mb-4">
 
 <div class="col-md-4">
-<div class="card-box text-center">
-<h6>إجمالي المدفوعات</h6>
-<h3 id="totalPaid">0 ريال</h3>
-</div>
-</div>
-
-<div class="col-md-4">
-<div class="card-box text-center">
+<div class="stat-card">
 <h6>إجمالي العقود</h6>
-<h3 id="totalContracts">0 ريال</h3>
+<h3 id="totalContracts">0</h3>
 </div>
 </div>
 
 <div class="col-md-4">
-<div class="card-box text-center">
+<div class="stat-card">
+<h6>إجمالي المدفوعات</h6>
+<h3 id="totalPaid">0</h3>
+</div>
+</div>
+
+<div class="col-md-4">
+<div class="stat-card">
 <h6>إجمالي المتبقي</h6>
-<h3 id="totalRemaining">0 ريال</h3>
+<h3 id="totalRemaining">0</h3>
 </div>
 </div>
 
 </div>
 
-<!-- ===== Form ===== -->
+<!-- Chart -->
+<div class="card-box mb-4">
+<h6 class="mb-3">تحليل الإيرادات الشهرية</h6>
+<canvas id="revenueChart" height="90"></canvas>
+</div>
+
+<!-- Form -->
 <div class="card-box mb-4">
 <form id="paymentForm" class="row g-3">
 
@@ -88,7 +109,7 @@
 </form>
 </div>
 
-<!-- ===== Table ===== -->
+<!-- Table -->
 <div class="card-box">
 <table class="table table-bordered text-center align-middle">
 <thead class="table-dark">
@@ -97,6 +118,7 @@
 <th>المبلغ</th>
 <th>التاريخ</th>
 <th>المتبقي</th>
+<th>إيصال</th>
 <th>حذف</th>
 </tr>
 </thead>
@@ -109,6 +131,7 @@
 <script src="assets/js/app.js"></script>
 
 <script>
+
 let clients = JSON.parse(localStorage.getItem("clients")) || [];
 let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
 let payments = JSON.parse(localStorage.getItem("payments")) || [];
@@ -128,14 +151,30 @@ let paid = payments
 return booking.total - paid;
 }
 
+function animate(id,value){
+let obj=document.getElementById(id);
+let start=0;
+let duration=800;
+let step=value/50;
+let counter=setInterval(()=>{
+start+=step;
+if(start>=value){
+obj.innerText=value+" ريال";
+clearInterval(counter);
+}else{
+obj.innerText=Math.floor(start)+" ريال";
+}
+},duration/50);
+}
+
 function updateStats(){
 let totalContracts = bookings.reduce((s,b)=>s+b.total,0);
 let totalPaid = payments.reduce((s,p)=>s+p.amount,0);
 let remaining = totalContracts - totalPaid;
 
-document.getElementById("totalContracts").innerText = totalContracts+" ريال";
-document.getElementById("totalPaid").innerText = totalPaid+" ريال";
-document.getElementById("totalRemaining").innerText = remaining+" ريال";
+animate("totalContracts",totalContracts);
+animate("totalPaid",totalPaid);
+animate("totalRemaining",remaining);
 }
 
 function loadBookings(){
@@ -166,12 +205,16 @@ paymentTable.innerHTML+=`
 ${remain} ريال
 </td>
 <td>
+<button class="btn btn-primary btn-sm" onclick="printReceipt(${p.id})">🧾</button>
+</td>
+<td>
 <button class="btn btn-danger btn-sm" onclick="deletePayment(${p.id})">🗑</button>
 </td>
 </tr>`;
 });
 
 updateStats();
+drawChart();
 }
 
 function deletePayment(id){
@@ -203,8 +246,57 @@ this.reset();
 renderPayments();
 });
 
+function printReceipt(id){
+let payment = payments.find(p=>p.id==id);
+let booking = bookings.find(b=>b.id==payment.bookingId);
+let client = clients.find(c=>c.id==booking.clientId);
+
+let receipt = `
+إيصال دفع - قصر الماسة
+
+العميل: ${client.name}
+المبلغ: ${payment.amount} ريال
+التاريخ: ${payment.date}
+
+شكراً لتعاملكم معنا 💎
+`;
+
+let w = window.open("");
+w.document.write("<pre>"+receipt+"</pre>");
+w.print();
+}
+
+function drawChart(){
+
+let monthly = {};
+
+payments.forEach(p=>{
+let month = p.date.substring(0,7);
+monthly[month] = (monthly[month] || 0) + Number(p.amount);
+});
+
+let labels = Object.keys(monthly);
+let data = Object.values(monthly);
+
+new Chart(document.getElementById("revenueChart"),{
+type:"bar",
+data:{
+labels:labels,
+datasets:[{
+data:data,
+borderRadius:8
+}]
+},
+options:{
+plugins:{legend:{display:false}},
+scales:{y:{beginAtZero:true}}
+}
+});
+}
+
 loadBookings();
 renderPayments();
+
 </script>
 
 </body>

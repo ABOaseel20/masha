@@ -175,3 +175,46 @@ text-align:center;
 body.dark .card{
 background:#1f1f1f;
 }
+/* ===== DASHBOARD CARDS ===== */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, .1);
+  text-align: center;
+}
+
+body.dark .card {
+  background: #1f1f1f;
+  color: white;
+}
+
+/* أزرار تنسيقية */
+.toggle-btn {
+  background: gold;
+  border: none;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.btn-primary {
+  background: #6d4c41;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #4e342e;
+}
+
+.btn-danger {
+  background: #c62828;
+  color: white;
+}
+

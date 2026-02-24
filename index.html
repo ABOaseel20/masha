@@ -1,103 +1,89 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<title>لوحة التحكم</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="assets/css/style.css">
+  <meta charset="UTF-8">
+  <title>لوحة التحكم</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- ربط ملف الستايل -->
+  <link rel="stylesheet" href="assets/css/style.css">
 </head>
-
 <body class="light">
 
-<!-- HEADER -->
-<div class="header">
-<button onclick="toggleSidebar()">☰</button>
-<h3>لوحة التحكم</h3>
-<button onclick="toggleMode()">🌙 / ☀</button>
-</div>
+  <!-- HEADER -->
+  <div class="header">
+    <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+    <h3>لوحة التحكم</h3>
+    <button onclick="toggleMode()">🌙 / ☀</button>
+  </div>
 
-<!-- SIDEBAR -->
-<div class="sidebar" id="sidebar">
-<a href="index.html">🏠 داشبورد</a>
-<a href="clients.html">👥 العملاء</a>
-<a href="bookings.html">📅 الحجوزات</a>
-<a href="payments.html">💰 المدفوعات</a>
-<a href="reports.html">📊 التقارير</a>
-</div>
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <a href="index.html">🏠 داشبورد</a>
+    <a href="clients.html">👥 العملاء</a>
+    <a href="bookings.html">📅 الحجوزات</a>
+    <a href="payments.html">💰 المدفوعات</a>
+    <a href="reports.html">📊 التقارير</a>
+  </div>
 
-<!-- OVERLAY -->
-<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+  <!-- OVERLAY -->
+  <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
-<!-- MAIN -->
-<div class="main">
+  <!-- MAIN -->
+  <div class="main">
+    <h2 style="margin-bottom:20px;">الإحصائيات العامة</h2>
+    <div class="cards">
+      <div class="card">
+        <h4>عدد العملاء</h4>
+        <h2 id="clientsCount">0</h2>
+      </div>
+      <div class="card">
+        <h4>عدد الحجوزات</h4>
+        <h2 id="bookingsCount">0</h2>
+      </div>
+      <div class="card">
+        <h4>إجمالي الإيرادات</h4>
+        <h2 id="revenueCount">0 ريال</h2>
+      </div>
+      <div class="card">
+        <h4>المتبقي</h4>
+        <h2 id="remainingCount">0 ريال</h2>
+      </div>
+    </div>
+  </div>
 
-<h2 style="margin-bottom:20px;">الإحصائيات العامة</h2>
+  <script>
+    // ===== SIDEBAR (فتح/غلق) =====
+    function toggleSidebar() {
+      document.getElementById("sidebar").classList.toggle("active");
+      document.getElementById("overlay").classList.toggle("show");
+    }
+    function closeSidebar() {
+      document.getElementById("sidebar").classList.remove("active");
+      document.getElementById("overlay").classList.remove("show");
+    }
 
-<div class="cards">
+    // ===== MODE (ليلي/نهاري) =====
+    function toggleMode() {
+      document.body.classList.toggle("dark");
+      document.body.classList.toggle("light");
+    }
 
-<div class="card">
-<h4>عدد العملاء</h4>
-<h2 id="clientsCount">0</h2>
-</div>
+    // ===== حساب الإحصائيات =====
+    let clients = JSON.parse(localStorage.getItem("clients")) || [];
+    let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+    let payments = JSON.parse(localStorage.getItem("payments")) || [];
 
-<div class="card">
-<h4>عدد الحجوزات</h4>
-<h2 id="bookingsCount">0</h2>
-</div>
+    function calculateStats() {
+      let totalRevenue = payments.reduce((sum, p) => sum + Number(p.amount), 0);
+      let totalContracts = bookings.reduce((sum, b) => sum + Number(b.total), 0);
+      let remaining = totalContracts - totalRevenue;
 
-<div class="card">
-<h4>إجمالي الإيرادات</h4>
-<h2 id="revenueCount">0 ريال</h2>
-</div>
-
-<div class="card">
-<h4>المتبقي</h4>
-<h2 id="remainingCount">0 ريال</h2>
-</div>
-
-</div>
-
-</div>
-
-<script>
-
-/* ===== SIDEBAR ===== */
-function toggleSidebar(){
-document.getElementById("sidebar").classList.toggle("active");
-document.getElementById("overlay").classList.toggle("show");
-}
-
-function closeSidebar(){
-document.getElementById("sidebar").classList.remove("active");
-document.getElementById("overlay").classList.remove("show");
-}
-
-/* ===== MODE ===== */
-function toggleMode(){
-document.body.classList.toggle("dark");
-document.body.classList.toggle("light");
-}
-
-/* ===== DATA ===== */
-let clients = JSON.parse(localStorage.getItem("clients")) || [];
-let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
-let payments = JSON.parse(localStorage.getItem("payments")) || [];
-
-function calculateStats(){
-
-let totalRevenue = payments.reduce((sum,p)=> sum + Number(p.amount),0);
-let totalContracts = bookings.reduce((sum,b)=> sum + Number(b.total),0);
-let remaining = totalContracts - totalRevenue;
-
-document.getElementById("clientsCount").innerText = clients.length;
-document.getElementById("bookingsCount").innerText = bookings.length;
-document.getElementById("revenueCount").innerText = totalRevenue + " ريال";
-document.getElementById("remainingCount").innerText = remaining + " ريال";
-}
-
-calculateStats();
-
-</script>
-
+      document.getElementById("clientsCount").innerText = clients.length;
+      document.getElementById("bookingsCount").innerText = bookings.length;
+      document.getElementById("revenueCount").innerText = totalRevenue + " ريال";
+      document.getElementById("remainingCount").innerText = remaining + " ريال";
+    }
+    calculateStats();
+  </script>
 </body>
 </html>

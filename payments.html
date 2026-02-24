@@ -5,167 +5,7 @@
 <title>إدارة المدفوعات</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<style>
-body{
-margin:0;
-font-family:Arial, sans-serif;
-transition:.3s;
-}
-
-/* ===== LIGHT / DARK ===== */
-body.light{
-background:#f5f1ea;
-color:#3e2723;
-}
-
-body.dark{
-background:#1e1e1e;
-color:white;
-}
-
-/* ===== HEADER ===== */
-.header{
-height:60px;
-background:#5d4037;
-color:white;
-display:flex;
-align-items:center;
-justify-content:space-between;
-padding:0 20px;
-position:fixed;
-top:0;
-left:0;
-right:0;
-z-index:1000;
-}
-
-.toggle-btn{
-background:gold;
-border:none;
-padding:6px 12px;
-cursor:pointer;
-}
-
-/* ===== SIDEBAR ===== */
-.sidebar{
-position:fixed;
-top:60px;
-right:-260px;
-width:260px;
-height:100%;
-background:#3e2723;
-padding:20px;
-transition:.3s;
-z-index:999;
-}
-
-.sidebar.active{
-right:0;
-}
-
-.sidebar a{
-display:block;
-color:#d7ccc8;
-text-decoration:none;
-margin-bottom:12px;
-}
-
-.sidebar a:hover{
-background:#5d4037;
-padding:5px;
-border-radius:4px;
-}
-
-/* ===== OVERLAY ===== */
-.overlay{
-position:fixed;
-top:60px;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,.5);
-display:none;
-z-index:500;
-}
-
-.overlay.show{
-display:block;
-}
-
-/* ===== MAIN ===== */
-.main{
-margin-top:70px;
-padding:20px;
-}
-
-/* ===== FORM ===== */
-form{
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-margin-bottom:20px;
-}
-
-select,input{
-padding:6px;
-border:1px solid #ccc;
-border-radius:4px;
-}
-
-button{
-padding:6px 12px;
-border:none;
-border-radius:4px;
-cursor:pointer;
-}
-
-.add-btn{
-background:#6d4c41;
-color:white;
-}
-
-.add-btn:hover{
-background:#4e342e;
-}
-
-/* ===== TABLE ===== */
-table{
-width:100%;
-border-collapse:collapse;
-background:white;
-color:black;
-}
-
-body.dark table{
-background:#2b2b2b;
-color:white;
-}
-
-th{
-background:#5d4037;
-color:white;
-padding:8px;
-}
-
-td{
-padding:8px;
-text-align:center;
-}
-
-tr:nth-child(even){
-background:#f1e6dc;
-}
-
-body.dark tr:nth-child(even){
-background:#333;
-}
-
-.delete-btn{
-background:red;
-color:white;
-padding:4px 10px;
-}
-</style>
+<link rel="stylesheet" href="assets/css/style.css">
 </head>
 
 <body class="light">
@@ -179,11 +19,11 @@ padding:4px 10px;
 
 <!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
-<a href="#">🏠 داشبورد</a>
-<a href="#">👥 العملاء</a>
-<a href="#">📅 الحجوزات</a>
-<a href="#">💰 المدفوعات</a>
-<a href="#">📊 التقارير</a>
+<a href="index.html">🏠 داشبورد</a>
+<a href="clients.html">👥 العملاء</a>
+<a href="bookings.html">📅 الحجوزات</a>
+<a href="payments.html">💰 المدفوعات</a>
+<a href="reports.html">📊 التقارير</a>
 </div>
 
 <!-- OVERLAY -->
@@ -223,12 +63,10 @@ padding:4px 10px;
 
 <script>
 
-/* ===== SIDEBAR ===== */
+/* SIDEBAR */
 function toggleSidebar(){
-let sidebar = document.getElementById("sidebar");
-let overlay = document.getElementById("overlay");
-sidebar.classList.toggle("active");
-overlay.classList.toggle("show");
+document.getElementById("sidebar").classList.toggle("active");
+document.getElementById("overlay").classList.toggle("show");
 }
 
 function closeSidebar(){
@@ -236,13 +74,13 @@ document.getElementById("sidebar").classList.remove("active");
 document.getElementById("overlay").classList.remove("show");
 }
 
-/* ===== MODE ===== */
+/* MODE */
 function toggleMode(){
 document.body.classList.toggle("dark");
 document.body.classList.toggle("light");
 }
 
-/* ===== DATA ===== */
+/* DATA */
 let clients = JSON.parse(localStorage.getItem("clients")) || [];
 let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
 let payments = JSON.parse(localStorage.getItem("payments")) || [];
@@ -267,9 +105,7 @@ let select = document.getElementById("bookingSelect");
 select.innerHTML = '<option value="">اختر الحجز</option>';
 
 bookings.forEach(b=>{
-let client = clients.find(c =>
-Number(c.id) === Number(b.clientId)
-);
+let client = clients.find(c => Number(c.id) === Number(b.clientId));
 
 select.innerHTML += `
 <option value="${b.id}">
@@ -283,10 +119,7 @@ let table = document.getElementById("paymentTable");
 table.innerHTML="";
 
 payments.forEach(p=>{
-let booking = bookings.find(b =>
-Number(b.id) === Number(p.bookingId)
-);
-
+let booking = bookings.find(b => Number(b.id) === Number(p.bookingId));
 let client = booking
 ? clients.find(c => Number(c.id) === Number(booking.clientId))
 : null;
@@ -300,18 +133,14 @@ table.innerHTML+=`
 <td>${p.date}</td>
 <td>${remaining} ريال</td>
 <td>
-<button class="delete-btn" onclick="deletePayment(${p.id})">
-🗑
-</button>
+<button class="delete-btn" onclick="deletePayment(${p.id})">🗑</button>
 </td>
 </tr>`;
 });
 }
 
 function deletePayment(id){
-payments = payments.filter(p =>
-Number(p.id) !== Number(id)
-);
+payments = payments.filter(p => Number(p.id) !== Number(id));
 savePayments();
 renderPayments();
 }

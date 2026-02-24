@@ -2,136 +2,121 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>إدارة الحجوزات | قصر الماسة</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<!-- ربط ملف الستايل -->
+<title>إدارة الحجوزات</title>
 <link rel="stylesheet" href="assets/css/style.css">
-
 </head>
-<body>
 
-<h2>إدارة الحجوزات</h2>
+<body class="light">
+
+<div class="header">
+<button onclick="toggleSidebar()">☰</button>
+<h3>إدارة الحجوزات</h3>
+<button onclick="toggleMode()">🌙 / ☀</button>
+</div>
+
+<div class="sidebar" id="sidebar">
+<a href="index.html">🏠 داشبورد</a>
+<a href="clients.html">👥 العملاء</a>
+<a href="bookings.html">📅 الحجوزات</a>
+<a href="payments.html">💰 المدفوعات</a>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<div class="main">
 
 <form id="bookingForm">
-
-<select id="clientSelect" required>
-<option value="">اختر عميل</option>
-</select>
-
+<select id="clientSelect" required></select>
 <input type="number" id="total" placeholder="إجمالي العقد" required>
-
 <input type="date" id="date" required>
-
-<button type="submit">حفظ الحجز</button>
-
+<button class="btn-primary">إضافة حجز</button>
 </form>
 
-<br><br>
-
-<table border="1" width="100%" cellpadding="10">
-
+<table>
 <thead>
 <tr>
-<th>اسم العميل</th>
+<th>العميل</th>
 <th>المبلغ</th>
 <th>التاريخ</th>
 <th>حذف</th>
 </tr>
 </thead>
-
 <tbody id="bookingTable"></tbody>
-
 </table>
 
-<script>
+</div>
 
+<script>
 let clients = JSON.parse(localStorage.getItem("clients")) || [];
 let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
-
-/* تنظيف أي حجز مرتبط بعميل غير موجود */
-bookings = bookings.filter(b =>
-clients.some(c => Number(c.id) === Number(b.clientId))
-);
-
-localStorage.setItem("bookings", JSON.stringify(bookings));
 
 function saveBookings(){
 localStorage.setItem("bookings", JSON.stringify(bookings));
 }
 
 function loadClients(){
-let select = document.getElementById("clientSelect");
-select.innerHTML = '<option value="">اختر عميل</option>';
-
+clientSelect.innerHTML="";
 clients.forEach(c=>{
-select.innerHTML += `
-<option value="${Number(c.id)}">
-${c.name}
-</option>`;
+clientSelect.innerHTML+=
+`<option value="${c.id}">${c.name}</option>`;
 });
 }
 
 function renderBookings(){
-let table = document.getElementById("bookingTable");
-table.innerHTML = "";
-
+bookingTable.innerHTML="";
 bookings.forEach(b=>{
-let client = clients.find(c =>
-Number(c.id) === Number(b.clientId)
-);
-
-table.innerHTML += `
+let client = clients.find(c=>Number(c.id)===Number(b.clientId));
+bookingTable.innerHTML+=`
 <tr>
-<td>${client ? client.name : "عميل غير موجود"}</td>
-<td>${b.total} ريال</td>
+<td>${client ? client.name : "غير موجود"}</td>
+<td>${b.total}</td>
 <td>${b.date}</td>
-<td align="center">
-<button onclick="deleteBooking(${b.id})"
-style="background:red;color:white;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;">
-🗑 حذف
-</button>
+<td>
+<button class="btn-danger"
+onclick="deleteBooking(${b.id})">🗑</button>
 </td>
 </tr>`;
 });
 }
 
 function deleteBooking(id){
-bookings = bookings.filter(b =>
-Number(b.id) !== Number(id)
-);
+bookings = bookings.filter(b=>b.id!=id);
 saveBookings();
 renderBookings();
 }
 
-document.getElementById("bookingForm")
-.addEventListener("submit", function(e){
-
+bookingForm.addEventListener("submit",function(e){
 e.preventDefault();
-
-let clientId = document.getElementById("clientSelect").value;
-
-if(!clientId){
-alert("اختر عميل أولاً");
-return;
-}
-
 bookings.push({
-id: Date.now(),
-clientId: Number(clientId),
-total: Number(document.getElementById("total").value),
-date: document.getElementById("date").value
+id:Date.now(),
+clientId:clientSelect.value,
+total:total.value,
+date:date.value
 });
-
 saveBookings();
-this.reset();
 renderBookings();
-
+this.reset();
 });
 
 loadClients();
 renderBookings();
+</script>
 
+<script>
+function toggleSidebar(){
+document.getElementById("sidebar").classList.toggle("active");
+document.getElementById("overlay").classList.toggle("show");
+}
+
+function closeSidebar(){
+document.getElementById("sidebar").classList.remove("active");
+document.getElementById("overlay").classList.remove("show");
+}
+
+function toggleMode(){
+document.body.classList.toggle("dark");
+document.body.classList.toggle("light");
+}
 </script>
 
 </body>

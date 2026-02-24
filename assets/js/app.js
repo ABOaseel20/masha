@@ -1,76 +1,32 @@
-document.addEventListener("DOMContentLoaded",function(){
-
-const sidebar=document.getElementById("sidebar");
-const overlay=document.getElementById("overlay");
-const loader=document.querySelector(".loader");
-
-/* ===== Loader ===== */
-setTimeout(()=>{
-if(loader) loader.style.display="none";
-},800);
-
-/* ===== Toggle Sidebar ===== */
-window.toggleSidebar=function(){
-sidebar.classList.toggle("active");
-overlay.classList.toggle("show");
-}
-
-window.closeSidebar=function(){
-sidebar.classList.remove("active");
-overlay.classList.remove("show");
-}
-
-document.addEventListener("keydown",function(e){
-if(e.key==="Escape"){
-closeSidebar();
-}
-});
-
-/* ===== Theme ===== */
-window.toggleMode=function(){
-if(document.body.classList.contains("dark")){
-document.body.classList.remove("dark");
-document.body.classList.add("light");
-localStorage.setItem("theme","light");
-}else{
-document.body.classList.remove("light");
-document.body.classList.add("dark");
-localStorage.setItem("theme","dark");
-}
-}
-
-let savedTheme=localStorage.getItem("theme")||"dark";
-document.body.classList.add(savedTheme);
-
-/* ===== Dashboard Stats ===== */
-if(document.getElementById("stats")){
-let clients=JSON.parse(localStorage.getItem("clients"))||[];
-let bookings=JSON.parse(localStorage.getItem("bookings"))||[];
-let payments=JSON.parse(localStorage.getItem("payments"))||[];
-
-let totalContracts=bookings.reduce((s,b)=>s+b.total,0);
-let totalPayments=payments.reduce((s,p)=>s+p.amount,0);
-let remaining=totalContracts-totalPayments;
-
-document.getElementById("clientsCount").innerText=clients.length;
-document.getElementById("bookingsCount").innerText=bookings.length;
-document.getElementById("totalContracts").innerText=totalContracts+" ريال";
-document.getElementById("totalPayments").innerText=totalPayments+" ريال";
-document.getElementById("remainingAmount").innerText=remaining+" ريال";
-}
-
-});
-function toggleSidebar(){
-document.getElementById("sidebar").classList.toggle("active");
-document.getElementById("overlay").classList.toggle("show");
-}
-
-function closeSidebar(){
-document.getElementById("sidebar").classList.remove("active");
-document.getElementById("overlay").classList.remove("show");
-}
+// الوضع الليلي فقط
 
 function toggleMode(){
-document.body.classList.toggle("dark");
-document.body.classList.toggle("light");
+let body=document.body;
+let icon=document.getElementById("modeIcon");
+
+if(body.classList.contains("dark")){
+body.classList.replace("dark","light");
+if(icon) icon.classList.replace("bi-moon","bi-sun");
+localStorage.setItem("mode","light");
+}else{
+body.classList.replace("light","dark");
+if(icon) icon.classList.replace("bi-sun","bi-moon");
+localStorage.setItem("mode","dark");
+}
+}
+
+function toggleSidebar(){
+let sidebar=document.getElementById("sidebar");
+let content=document.getElementById("content");
+
+if(sidebar) sidebar.classList.toggle("collapsed");
+if(content) content.classList.toggle("full");
+}
+
+window.onload=function(){
+if(localStorage.getItem("mode")==="light"){
+document.body.classList.replace("dark","light");
+let icon=document.getElementById("modeIcon");
+if(icon) icon.classList.replace("bi-moon","bi-sun");
+}
 }

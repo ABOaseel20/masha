@@ -2,54 +2,24 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>الحجوزات | قصر الماسة</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+<title>الحجوزات</title>
 <link href="assets/css/style.css" rel="stylesheet">
 </head>
-
-<body class="dark">
-
-<div class="loader"><img src="assets/img/diamond.png"></div>
-
-<div class="header">
-<button class="toggle-btn" onclick="toggleSidebar()">☰</button>
-<h4>إدارة الحجوزات</h4>
-<button onclick="toggleMode()" class="btn btn-sm btn-warning">🌙 / ☀</button>
-</div>
-
-<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
-
-<div class="sidebar" id="sidebar">
-<a href="index.html">🏠 داشبورد</a>
-<a href="clients.html">👥 العملاء</a>
-<a href="bookings.html" class="active-link">📅 الحجوزات</a>
-<a href="payments.html">💰 المدفوعات</a>
-<a href="reports.html">📊 التقارير</a>
-</div>
+<body>
 
 <div class="main">
 
-<div class="card-box mb-4">
-<form id="bookingForm" class="row g-3">
-<div class="col-md-4">
-<select id="clientSelect" class="form-control" required></select>
-</div>
-<div class="col-md-3">
-<input type="number" id="total" class="form-control" placeholder="إجمالي العقد" required>
-</div>
-<div class="col-md-3">
-<input type="date" id="date" class="form-control" required>
-</div>
-<div class="col-md-2">
-<button class="btn btn-success w-100">حفظ</button>
-</div>
-</form>
-</div>
+<h3>إدارة الحجوزات</h3>
 
-<div class="card-box">
-<table class="table table-bordered text-center">
-<thead class="table-dark">
+<form id="bookingForm">
+<select id="clientSelect" required></select>
+<input type="number" id="total" placeholder="المبلغ" required>
+<input type="date" id="date" required>
+<button>حفظ</button>
+</form>
+
+<table border="1" width="100%">
+<thead>
 <tr>
 <th>العميل</th>
 <th>المبلغ</th>
@@ -59,54 +29,58 @@
 </thead>
 <tbody id="bookingTable"></tbody>
 </table>
-</div>
 
 </div>
 
-<script src="assets/js/app.js"></script>
 <script>
-let clients=JSON.parse(localStorage.getItem("clients"))||[];
-let bookings=JSON.parse(localStorage.getItem("bookings"))||[];
+
+let clients = JSON.parse(localStorage.getItem("clients")) || [];
+let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
 
 function saveBookings(){
-localStorage.setItem("bookings",JSON.stringify(bookings));
+localStorage.setItem("bookings", JSON.stringify(bookings));
 }
 
 function loadClients(){
 clientSelect.innerHTML="";
 clients.forEach(c=>{
-clientSelect.innerHTML+=`<option value="${c.id}">${c.name}</option>`;
+clientSelect.innerHTML+=`
+<option value="${Number(c.id)}">${c.name}</option>`;
 });
 }
 
 function renderBookings(){
 bookingTable.innerHTML="";
+
 bookings.forEach(b=>{
-let client=clients.find(c=>c.id==b.clientId);
+let client = clients.find(c=>Number(c.id)===Number(b.clientId));
+
 bookingTable.innerHTML+=`
 <tr>
-<td>${client?.name}</td>
+<td>${client ? client.name : "عميل محذوف"}</td>
 <td>${b.total} ريال</td>
 <td>${b.date}</td>
-<td><button class="btn btn-danger btn-sm" onclick="deleteBooking(${b.id})">🗑</button></td>
+<td><button onclick="deleteBooking(${b.id})">🗑</button></td>
 </tr>`;
 });
 }
 
 function deleteBooking(id){
-bookings=bookings.filter(b=>b.id!=id);
+bookings = bookings.filter(b=>Number(b.id)!==Number(id));
 saveBookings();
 renderBookings();
 }
 
 bookingForm.addEventListener("submit",function(e){
 e.preventDefault();
+
 bookings.push({
-id:Date.now(),
-clientId:clientSelect.value,
-total:Number(total.value),
-date:date.value
+id: Date.now(),
+clientId: Number(clientSelect.value),
+total: Number(total.value),
+date: date.value
 });
+
 saveBookings();
 this.reset();
 renderBookings();
@@ -114,7 +88,7 @@ renderBookings();
 
 loadClients();
 renderBookings();
-</script>
 
+</script>
 </body>
 </html>

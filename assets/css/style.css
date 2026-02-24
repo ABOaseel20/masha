@@ -139,3 +139,62 @@ body.light .card-box{
 background:white;
 color:black;
 }
+
+/* ===== BOOKINGS TABLE ===== */
+.table-custom{
+width:100%;
+border-collapse:collapse;
+background:white;
+border-radius:12px;
+overflow:hidden;
+box-shadow:0 8px 20px rgba(0,0,0,.1);
+}
+
+.table-custom thead{
+background:#4e342e;
+color:white;
+}
+
+.table-custom th,
+.table-custom td{
+padding:14px;
+text-align:center;
+}
+
+.table-custom tbody tr:hover{
+background:#efebe9;
+}
+
+.delete-btn{
+background:#c62828;
+color:white;
+border:none;
+padding:6px 12px;
+border-radius:6px;
+cursor:pointer;
+font-size:16px;
+transition:.2s;
+}
+
+.delete-btn:hover{
+background:#8e0000;
+transform:scale(1.05);
+}
+
+.form-control{
+padding:8px;
+border-radius:6px;
+border:1px solid #ccc;
+}
+
+.btn-main{
+background:#6d4c41;
+color:white;
+border:none;
+padding:8px 15px;
+border-radius:6px;
+cursor:pointer;
+}
+.btn-main:hover{
+background:#4e342e;
+}
